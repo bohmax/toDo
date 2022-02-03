@@ -1,27 +1,41 @@
-import { StyleSheet, Text, View } from 'react-native';
-import {TextInput, Button} from "react-native-web";
+import { StyleSheet, View, FlatList } from 'react-native';
 import React from "react";
+import Todo from "./components/Todo"
+import TodoInput from "./components/TodoInput";
 
 export default class App extends React.Component {
   state = {
-    text: '',
+    todoList: [],
+    id: 0
+  }
+  addToDoHandler = (value) => {
+    if (value.trim() === "") {
+      alert("Scrivi qualcosa")
+      return
+    }
+    this.setState(prevState => {
+      return {
+        todoList: prevState.todoList.concat({value: value, id: prevState.id}),
+        id: prevState.id + 1
+      }
+    })
+  }
+  deleteTodoHandler = (id) => {
+    this.setState(prevState => {
+      return {
+        todoList: prevState.todoList.filter(e => e.id !== id)
+      }
+    })
   }
   render() {
     return (
-        <View style={styles.container}>
-          <View style={styles.InputContainer}>
-            {/* Input */}
-            <TextInput placeholder={"scrivi todo"} style={styles.Input}/>
-            <Button
-                title={"Invio"}
-                onPress={() => {}}
-            />
-          </View>
+        <View>
+          <TodoInput onAddTodo={this.addToDoHandler} />
           <View>
-            {/* Output */}
-            <Text>
-
-            </Text>
+            <FlatList data={this.state.todoList} renderItem={item =>
+                <Todo onDeleteTodo={() => this.deleteTodoHandler(item.item.id)} title={item.item.value}/>
+            }
+            />
           </View>
         </View>
     );
@@ -36,17 +50,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
 
   },
-    Input: {
-      width: '80%',
-      borderWidth: 1,
-      borderRadius: 5,
-      paddingVertical: 5,
-      paddingLeft: 3
-    },
-  InputContainer: {
-    marginTop: 50,
-    padding: 50,
-    flexDirection: "row",
-    alignItems: "center"
-  }
 });
